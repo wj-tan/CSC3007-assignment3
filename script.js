@@ -39,6 +39,11 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
       );
 
     let geopath = d3.geoPath().projection(projection);
+    
+    // Set up colorscale
+    let colorScale = d3.scaleOrdinal()
+    .domain([0, 64000])
+    .range(d3.schemeBlues[9])
 
     svg
       .append("g")
@@ -48,7 +53,9 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
       .enter()
       .append("path")
       .attr("d", geopath)
-      .attr("fill", "black")
+      .attr("fill", d => colorScale(populationData[d.properties.Name.toUpperCase()]))
+      .attr("stroke","#fff")
+      .attr("stroke-width", 0.5)
       .on("mouseover", (event, d) => { 
         d3.select(".tooltip").html(
           "<h4>" +
