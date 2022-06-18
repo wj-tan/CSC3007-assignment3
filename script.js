@@ -39,11 +39,32 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
       );
 
     let geopath = d3.geoPath().projection(projection);
-    
+
     // Set up colorscale
-    let colorScale = d3.scaleOrdinal()
-    .domain([0, 64000])
-    .range( d3.schemeOrRd[9])
+    let colorScale = d3
+      .scaleOrdinal()
+      .domain([0, 64000])
+      .range(d3.schemeOrRd[0,9]);
+
+    let legendColor = d3
+      .scaleOrdinal()
+      .domain([0, 8000, 16000, 24000, 32000, 40000, 48000, 56000, 64000])
+      .range(d3.schemeOrRd[9]);
+
+    // Legend
+    var legend = d3
+      .legendColor()
+      .scale(legendColor)
+      .shapeWidth(40)
+    //   .cells([0, 8000, 16000, 24000, 32000, 40000, 48000, 56000, 64000])
+      .orient("horizontal")
+      .title("Population");
+
+    svg
+      .append("g")
+      .attr("transform", "translate(700,500)")
+      .style("font-size", "10px")
+      .call(legend);
 
     svg
       .append("g")
@@ -53,28 +74,30 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
       .enter()
       .append("path")
       .attr("d", geopath)
-      .attr("fill", d => colorScale(populationData[d.properties.Name.toUpperCase()]))
-      .attr("stroke","black")
+      .attr("fill", (d) =>
+        colorScale(populationData[d.properties.Name.toUpperCase()])
+      )
+      .attr("stroke", "black")
       .attr("stroke-width", 1)
-      .on("mouseover", (event, d) => { 
+      .on("mouseover", (event, d) => {
         d3.select(".tooltip")
-        // .text(d.properties.Name + "Population: " + populationData[d.properties.Name.toUpperCase()])
-        // .style("position", "absolute")
-        // .style("background", "#fff")
-        // .style("left", (event.pageX) + "px")
-        // .style("right", (event.pageY) + "px");
-        .html(
-          "<h4>" +
-            d.properties.Name +
-            "</h4>" +
-            "Population: " +
-            populationData[d.properties.Name.toUpperCase()]
-        );
+          // .text(d.properties.Name + "Population: " + populationData[d.properties.Name.toUpperCase()])
+          // .style("position", "absolute")
+          // .style("background", "#fff")
+          // .style("left", (event.pageX) + "px")
+          // .style("right", (event.pageY) + "px");
+          .html(
+            "<h4>" +
+              d.properties.Name +
+              "</h4>" +
+              "Population: " +
+              populationData[d.properties.Name.toUpperCase()]
+          );
 
         let path = d3.select(event.currentTarget);
         path.style("stroke", "red").style("stroke-width", 3);
       })
-      .on("mouseout", (event, d) => { 
+      .on("mouseout", (event, d) => {
         d3.select(".tooltip").text("");
 
         let path = d3.select(event.currentTarget);
