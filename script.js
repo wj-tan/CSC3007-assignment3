@@ -1,5 +1,5 @@
-let width = 1000,
-  height = 600;
+let width = 1200,
+  height = 800;
 
 let svg = d3.select("svg").attr("viewBox", "0 0 " + width + " " + height);
 
@@ -43,7 +43,7 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
     // Set up colorscale
     let colorScale = d3.scaleOrdinal()
     .domain([0, 64000])
-    .range(d3.schemeBlues[9])
+    .range( d3.schemeOrRd[9])
 
     svg
       .append("g")
@@ -54,10 +54,16 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
       .append("path")
       .attr("d", geopath)
       .attr("fill", d => colorScale(populationData[d.properties.Name.toUpperCase()]))
-      .attr("stroke","#fff")
-      .attr("stroke-width", 0.5)
+      .attr("stroke","black")
+      .attr("stroke-width", 1)
       .on("mouseover", (event, d) => { 
-        d3.select(".tooltip").html(
+        d3.select(".tooltip")
+        // .text(d.properties.Name + "Population: " + populationData[d.properties.Name.toUpperCase()])
+        // .style("position", "absolute")
+        // .style("background", "#fff")
+        // .style("left", (event.pageX) + "px")
+        // .style("right", (event.pageY) + "px");
+        .html(
           "<h4>" +
             d.properties.Name +
             "</h4>" +
@@ -66,13 +72,13 @@ Promise.all([d3.json("sgmap.json"), d3.csv("population2021.csv")]).then(
         );
 
         let path = d3.select(event.currentTarget);
-        path.style("stroke", "red").style("stroke-width", 2);
+        path.style("stroke", "red").style("stroke-width", 3);
       })
       .on("mouseout", (event, d) => { 
         d3.select(".tooltip").text("");
 
         let path = d3.select(event.currentTarget);
-        path.style("stroke", "none");
+        path.style("stroke", "black").style("stroke-width", 1);
       });
   }
 );
